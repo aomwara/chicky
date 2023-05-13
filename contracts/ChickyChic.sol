@@ -10,7 +10,7 @@ contract ChickyChicPoints is ERC1155, Ownable {
     event PointsEarned(address indexed account, uint256 amount);
     event PointsSpent(address indexed account, uint256 amount);
 
-    constructor() ERC1155("", "") {
+    constructor() ERC1155("ChickyChicPoints") {
         _tokenId = 1;
     }
 
