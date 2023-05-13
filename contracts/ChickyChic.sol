@@ -44,4 +44,18 @@ contract ChickyChicPoints is ERC1155, Ownable {
             "ChickyChicPoints: tokens are not transferable"
         );
     }
+    
+    function changeOwner (address _newOwner) public onlyOwner {
+        transferOwnership(_newOwner);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC1155)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
 }
