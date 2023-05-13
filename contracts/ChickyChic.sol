@@ -69,6 +69,7 @@ contract ChickyChicPoints is ERC1155, Ownable {
     function changeOwner (address _newOwner) public onlyOwner {
         transferOwnership(_newOwner);
     }
+
     function _beforeTokenTransfer(
         address operator,
         address from,
@@ -82,18 +83,7 @@ contract ChickyChicPoints is ERC1155, Ownable {
             "ChickyChicPoints: tokens are not transferable"
         );
     }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC1155)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
-    }
-
-
+    
     //Token URI
     function tokenURI(
         uint256 tokenId
