@@ -16,6 +16,10 @@ contract ChickyChicPoints is ERC1155, Ownable {
     // Point system
     mapping(address => uint256) private _pointsBalance;
 
+    // Token URI
+    string public baseURI;
+    string internal baseExtension = ".json";
+
     // Events
     event PointsEarned(address indexed account, uint256 amount);
     event PointsSpent(address indexed account, uint256 amount);
@@ -86,4 +90,33 @@ contract ChickyChicPoints is ERC1155, Ownable {
     {
         return super.supportsInterface(interfaceId);
     }
+
+
+    //Token URI
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "Capybara: not exist");
+        string memory currentBaseURI = _baseURI();
+        return (
+            bytes(currentBaseURI).length > 0
+                ? string(
+                    abi.encodePacked(
+                        currentBaseURI,
+                        tokenId.toString(),
+                        baseExtension
+                    )
+                )
+                : ""
+        );
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseURI;
+    }
+
+    function setBaseURI(string memory _newBaseURI) external onlyOwner {
+        baseURI = _newBaseURI;
+    }
+
 }
