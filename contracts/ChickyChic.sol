@@ -4,33 +4,65 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ChickyChicPoints is ERC1155, Ownable {
-    mapping(address => uint256) private _pointsBalance;
-    uint256 private _tokenId;
+    // Initial Token ID = 1
+    uint256 private _tokenId = 1;
 
+    // Membership
+    // mapping studentId to address
+    mapping(address => uint256) private studentId;
+    mapping(uint256 => address) private studentIdAddress;
+    mapping(uint256 => bool) private _isMember;
+
+    // Point system
+    mapping(address => uint256) private _pointsBalance;
+
+    // Events
     event PointsEarned(address indexed account, uint256 amount);
     event PointsSpent(address indexed account, uint256 amount);
 
-    constructor() ERC1155("ChickyChicPoints") {
-        _tokenId = 1;
+    constructor() ERC1155("ChickyChicPoints") {}
+
+    // Modifier to check if studentId is already registered
+    modifier isStudentIdNotRegistered (uint256 _studentId) {
+        require(studentId[msg.sender] == 0, "ChickyChicPoints: Student ID already registered");
+        _;
     }
 
-    function mintPoints(address account, uint256 amount) external onlyOwner {
+    //Get Student Address
+    function getStudentAddress (uint256 _studentId) public view returns (address) {
+        return studentIdAddress[_studentId];
+    }
+    // Register membership and map studentId to address
+    function registerMember ( uint256 _studentId) public isStudentIdNotRegistered(_studentId) {
+        studentId[msg.sender] = _studentId;
+        studentIdAddress[_studentId] = msg.sender;
+    }
+
+    //Mint point to member (By ChickyChic Owner)
+    function mintPoints(uint256 _studentId, uint256 amount) external onlyOwner {
+        require(studentIdAddress[_studentId] != address(0), "ChickyChicPoints: Student ID not registered");
+        address account = studentIdAddress[_studentId];
         _pointsBalance[account] += amount;
         _mint(account, _tokenId, amount, "");
     }
 
+    //Spend point (By member)
     function spendPoints(uint256 amount) external {
         require(_pointsBalance[msg.sender] >= amount, "ChickyChicPoints: Insufficient balance");
-
         _pointsBalance[msg.sender] -= amount;
         _burn(msg.sender, _tokenId, amount);
         emit PointsSpent(msg.sender, amount);
     }
 
+    //Check point balance ()
     function pointsBalance(address account) external view returns (uint256) {
         return _pointsBalance[account];
     }
 
+    // Change ChickyChic owner address
+    function changeOwner (address _newOwner) public onlyOwner {
+        transferOwnership(_newOwner);
+    }
     function _beforeTokenTransfer(
         address operator,
         address from,
@@ -43,10 +75,6 @@ contract ChickyChicPoints is ERC1155, Ownable {
             from == address(0) || to == address(0),
             "ChickyChicPoints: tokens are not transferable"
         );
-    }
-    
-    function changeOwner (address _newOwner) public onlyOwner {
-        transferOwnership(_newOwner);
     }
 
     function supportsInterface(bytes4 interfaceId)
