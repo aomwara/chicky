@@ -2,8 +2,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ChickyChicPoints is ERC1155, Ownable {
+    using Strings for uint256;
     // Initial Token ID = 1
     uint256 private _tokenId = 1;
 
@@ -95,8 +97,7 @@ contract ChickyChicPoints is ERC1155, Ownable {
     //Token URI
     function tokenURI(
         uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "Capybara: not exist");
+    ) public view returns (string memory) {
         string memory currentBaseURI = _baseURI();
         return (
             bytes(currentBaseURI).length > 0
@@ -111,7 +112,7 @@ contract ChickyChicPoints is ERC1155, Ownable {
         );
     }
 
-    function _baseURI() internal view virtual override returns (string memory) {
+    function _baseURI() internal view returns (string memory) {
         return baseURI;
     }
 
